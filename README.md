@@ -30,18 +30,17 @@ WordPress itself and generate the salt.
 0.  Make sure that the `wpinstall` is executable. If you git cloned you
     should be ok. If you just downloaded the file, run
     `chmod +x wpinstall` (inside the directory wherever you put it, of course)
+0.  Move/download the supplied `wpinstall.config` file to your home
+    directory and rename it to `.wpinstall`. Open it in a text editor and
+    fill in the username and password for the mysql database. They will
+    be used to generate your `wp-config.php` files.
 
 ## Usage
 
-0.  Open the wpinstall file in a text editor. There are two variables declared
-    at the top of the file: db_user and db_pass. These will be used to
-    generate your `wp-config.php` files, so put the username and password for
-    mysql in there. This is the only configuration, so I thought we wouldn’t
-    need an extra config file.
 0.  Go to the docroot of your web server
 0.  Run `wpinstall <name>` where <name> will be the directory name of your
     new WordPress AND the database name, so you better only have characters
-    in underscores in there. You can of course just rename the directory
+    and underscores in there. You can of course just rename the directory
     afterwards if you wish so.
 0.  Point your browser to the url of your WordPress and complete the
     installation.

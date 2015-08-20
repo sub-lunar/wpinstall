@@ -34,6 +34,9 @@ WordPress itself and generate the salt.
     directory and rename it to `.wpinstall`. Open it in a text editor and
     fill in the username and password for the mysql database. They will
     be used to generate your `wp-config.php` files.
+0.  If it’s not completely evident: you need to restart your shell or
+    source your shell profile/bashrc/whatever again from a running shell
+    so your path is read again and the new executable gets found
 
 ## Usage
 

@@ -1,0 +1,96 @@
+#!/bin/sh
+
+if [ -z "${1}" ]
+then
+  echo "your new wordpress needs a name!"
+  exit 1
+fi
+
+if [ ! -f ${HOME}/.wpinstall ]
+then
+  echo "~/.wpinstall not found!"
+  exit 1
+fi
+
+# source configuration
+source ${HOME}/.wpinstall
+
+# download latest wordpress package
+echo "downloading latest version of wordpress ..."
+wget https://wordpress.org/latest.tar.gz
+
+# unpack it, which creates a directory called wordpress
+echo "unpacking archive ..."
+tar -xf latest.tar.gz
+
+# remove the archive
+echo "removing downloaded archive ..."
+rm latest.tar.gz
+
+# rename the directory to the supplied name
+echo "renaming unpacked wordpress dir to ${1} ..."
+mv wordpress ${1}
+
+# create a database of the supplied name
+echo "creating new mysql database ${1} ..."
+mysql << EOF
+CREATE DATABASE ${1};
+EXIT
+EOF
+
+# build up wp-config
+echo "building ${1}/wp-config.php ..."
+
+# remember where we were
+workingdir=$(pwd)
+
+# change dir to the new wordpress directory
+cd ${1}
+
+# wordpress needs BOTH the untouched wp-config-sample.php
+# PLUS the wp-config.php with the actual settings for the
+# installation to work;
+
+# here, I just copy over the first lines, because the
+# next section of the file with the custom keys/salts
+# will be generated in the next step
+
+# startsalt will be the number of the first line of the
+# salts/keys block
+startsalt=$(sed -n "/define('AUTH_KEY'/=" wp-config-sample.php)
+
+# in our head command, we’ll actually want one less
+headlines=$(expr ${startsalt} - 1)
+
+head -n${headlines} wp-config-sample.php > wp-config.php
+
+# set database name to the supplied name once again,
+# and user and pass according to configuration
+sed -i "s|database_name_here|${1}|" wp-config.php
+sed -i "s|username_here|${db_user}|" wp-config.php
+sed -i "s|password_here|${db_pass}|" wp-config.php
+
+# create new random keys/salts and append them
+wpsalt >> wp-config.php
+
+# endsalt will be the number of the last line of the
+# salts/keys block
+endsalt=$(sed -n "/define('NONCE_SALT'/=" wp-config-sample.php)
+
+# totallines will hold the total number of lines in the file
+totallines=$(wc -l wp-config-sample.php | awk '{print $1}')
+
+# the number of lines we want from the end of the file is the
+# difference between the last two.
+taillines=$(expr ${totallines} - ${endsalt})
+
+# finally, add the last part of wp-config-sample.php
+tail -n${taillines} wp-config-sample.php >> wp-config.php
+
+# go back where we started
+cd ${workingdir}
+
+echo "done!"
+
+exit 0
+

@@ -1,8 +1,11 @@
 # wpinstall
 
-Shell script to install a new WordPress in a subdirectory of the current dir
+~~Shell~~ Zsh script to install a new WordPress in a subdirectory of the current dir
 
 ## Dependencies/Prerequisites
+
+I changed the shebang from #!/bin/sh to #!/usr/bin/env zsh because the script
+uses the source command to load config and zsh is the shell I’m using.
 
 wpinstall expects you to have the `wpsalt` script installed. (For `wpsalt`,
 look at my other repo.)
